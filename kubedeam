@@ -1,0 +1,120 @@
+https://rjthapaa.hashnode.dev/day-32-launching-your-kubernetes-cluster-with-deployment-kubeadm-multinode
+
+
+Let's create 3 Ubuntu servers using the Security Group
+
+1 Master node (t2.medium Instance)
+
+2 Worker nodes (t2.micro Instance)
+
+Execute these commands on both Master and Slave Nodes
+touch docker.sh
+
+vi docker.sh
+sudo apt-get update
+sudo apt-get install docker.io -y
+docker --version
+sudo usermod -aG docker $USER
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo systemctl status docker
+
+sh.docker.sh
+
+Step 2: Install K8s
+
+touch k8s.sh
+vi k8s.sh
+# Install curl
+sudo apt install curl
+
+# Add the GPG kubernetes key with the command
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg |  sudo apt-key add
+
+# To add the xenial kubernetes repository
+sudo bash -c 'echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'
+
+# Install kubeadm (k8s admin)
+sudo apt-get update && sudo apt-get install -y kubelet kubeadm kubectl
+
+# check whether the version of the component installed are compatible
+sudo apt-mark hold kubeadm kubelet kubectl kubernetes-cni
+kubeadm version
+
+# Disable swap memory
+sudo swapoff -a
+sudo systemctl daemon-reload
+sudo systemctl start kubelet
+sudo systemctl enable kubelet.service
+kubeadm version
+
+sh k8s.sh
+
+Only Master Node execution commands
+
+vi kube,sh
+sudo kubeadm init
+
+# To start using your cluster, you need to run the following as a regular user:
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+
+# Deploy Pod network to cluster (master)
+wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+sudo systemctl restart kubelet.service & kubectl get nodes
+
+# Exc this command in master & paste the token in worker as root user
+sudo kubeadm token create --print-join-command
+
+sudo systemctl restart kubelet.service & kubectl get nodes
+
+copy the token and paste the workernode.
+
+
+
+vi deployment.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80       
+               
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: NodePort
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      nodePort: 30080
+
+     
+kubectl apply -f deployment.yml
+
+
