@@ -1,0 +1,21 @@
+helm:The package manager for Kubernetes
+helm helps you manage Kubernetes applications — Helm Charts help you define, install, and upgrade even the most complex Kubernetes application.
+
+create t2.mideam install in ubuntu
+
+sudo snap install helm  --classic
+helm version
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm search repo bitnami
+helm pull bitnami/nginx --untar=true
+ls
+its show nginx
+helm install my-nginx  bitnami/apache
+kubectl get pods
+kubectl get svc --namespace default -w my-apache
+barath-nginx   LoadBalancer   10.105.143.207   <pending>     80:31151/TCP   49s{ like itys show}
+so open the port 31151
+copy  any master and worker node ip:31151
+
+
+
