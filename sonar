@@ -1,0 +1,47 @@
+sonar:
+code quality cheking
+to find bugs,vanarbilty,duplications
+
+
+vim sonar.sh
+#! /bin/bash
+#Launch an instance with 9000 and t2.medium
+amazon-linux-extras install java-openjdk11 -y
+yum install git  -y
+cd /opt/
+wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.4.0.54424.zip
+unzip sonarqube-9.4.0.54424.zip
+useradd sonarqube
+chown sonarqube:sonarqube sonarqube-9.4.0.54424  -R
+chmod 777 sonarqube-9.4.0.54424  -R
+su - sonarqube
+#run this on server manually
+#cd  /opt/sonarqube-9.4.0.54424/bin/linux-x86-64/sonar.sh start
+./sonar.sh start
+./sonar.sh status 
+
+java --version
+openjdk 17.0.9 2023-10-17 LTS
+
+cd /opt
+https://dlcdn.apache.org/maven/maven-3/3.9.5/binaries/apache-maven-3.9.5-bin.zip
+unzip apache-maven-3.9.5-bin.zip
+
+give the maven path.
+cd root
+vim .bash_profile
+M2_HOME=/opt/apache-maven-3.9.5
+M2=/opt/apache-maven-3.9.5/bin
+
+PATH=$PATH:$HOME/bin:$M2_HOME:$M2
+
+source  .bash_profile
+
+maven version
+Apache Maven 3.9.5 (57804ffe001d7215b5e7bcb531cf83df38f93546)
+Maven home: /opt/apache-maven-3.9.5
+Java version: 17.0.9, 
+
+
+copy public ip
+:9000
